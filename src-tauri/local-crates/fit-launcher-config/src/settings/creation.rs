@@ -194,3 +194,61 @@ pub fn create_image_cache_file() -> Result<(), std::io::Error> {
     }
     Ok(())
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct RealDebridSettings {
+    pub client_id: String,
+    pub refresh_token: Option<String>,
+}
+
+impl Default for RealDebridSettings {
+    fn default() -> Self {
+        RealDebridSettings {
+            client_id: "X245A4XAIBGVM".to_string(),
+            refresh_token: None,
+        }
+    }
+}
+
+pub fn create_realdebrid_settings_file() -> Result<(), std::io::Error> {
+    let base_dirs = BaseDirs::new().expect("Failed to determine base directories");
+    let rd_folder_path = base_dirs
+        .config_dir()
+        .join("com.fitlauncher.carrotrub")
+        .join("fitgirlConfig")
+        .join("settings")
+        .join("realdebrid");
+
+    if !rd_folder_path.exists() {
+        fs::create_dir_all(&rd_folder_path)
+            .expect("Failed to create Real-Debrid Config directory");
+    }
+
+    let rd_file_path = rd_folder_path.join("realdebrid.json");
+    if !rd_file_path.exists() {
+        let default_config = RealDebridSettings::default();
+        let default_config_data = serde_json::to_string_pretty(&default_config).map_err(|err| {
+            error!("Failed to serialize default RealDebrid config: {:#?}", err);
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                "Serialization of default RealDebrid config failed",
+            )
+        })?;
+        let mut file = fs::File::create(&rd_file_path).map_err(|err| {
+            error!("Error creating the file: {:#?}", err);
+            std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                "Directory not found for creating realdebrid.json file",
+            )
+        })?;
+        file.write_all(default_config_data.as_bytes())
+            .map_err(|err| {
+                error!("Failed to write to realdebrid.json file: {:#?}", err);
+                std::io::Error::new(
+                    std::io::ErrorKind::WriteZero,
+                    "Failed to write data to realdebrid.json",
+                )
+            })?;
+    }
+    Ok(())
+}

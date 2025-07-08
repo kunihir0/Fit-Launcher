@@ -91,6 +91,7 @@ mod checklist_automation {
 #[cfg(target_os = "windows")]
 pub mod windows_ui_automation {
     use fit_launcher_config::settings::config::get_installation_settings;
+    use std::env;
     use std::path::{Path, PathBuf};
     use std::process::Command;
     use std::{thread, time};
@@ -155,8 +156,22 @@ pub mod windows_ui_automation {
         }
     }
 
+    /// Translates a Linux-style path to a Windows-style path if running under Wine.
+    fn translate_path_for_wine(path: &str) -> String {
+        // Check for the WINEPREFIX environment variable to detect Wine.
+        if env::var("WINEPREFIX").is_ok() {
+            // Prepend "Z:" and replace forward slashes with backslashes.
+            format!("Z:{}", path.replace('/', "\\"))
+        } else {
+            // If not in Wine, return the path unmodified.
+            path.to_string()
+        }
+    }
+
     #[cfg(target_os = "windows")]
     pub async fn automate_until_download(path_to_game: &str) {
+        let translated_path = translate_path_for_wine(path_to_game);
+
         // Skip Select Setup Language.
         windows_controls_processes::click_ok_button();
         // Skip Select Setup Language.
@@ -170,7 +185,7 @@ pub mod windows_ui_automation {
             windows_controls_processes::click_next_button();
             // Skip until checkboxes.
             // Change path input, important for both cases.
-            windows_controls_processes::change_path_input(path_to_game);
+            windows_controls_processes::change_path_input(&translated_path);
             windows_controls_processes::click_next_button();
             // Change path input, important for both cases.
             // Start Installation.
@@ -181,7 +196,7 @@ pub mod windows_ui_automation {
             windows_controls_processes::click_next_button();
             windows_controls_processes::click_next_button();
             // Change path input, important for both cases.
-            windows_controls_processes::change_path_input(path_to_game);
+            windows_controls_processes::change_path_input(&translated_path);
             windows_controls_processes::click_next_button();
             // Change path input, important for both cases.
             // Start Installation.
@@ -196,7 +211,7 @@ pub mod windows_ui_automation {
             windows_controls_processes::click_next_button();
             // Skip until checkboxes.
             // Change path input, important for both cases.
-            windows_controls_processes::change_path_input(path_to_game);
+            windows_controls_processes::change_path_input(&translated_path);
             windows_controls_processes::click_next_button();
             // Change path input, important for both cases.
             // Start Installation.

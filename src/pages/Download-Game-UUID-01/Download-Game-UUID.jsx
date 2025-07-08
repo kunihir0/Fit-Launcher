@@ -6,7 +6,6 @@ import { appCacheDir, appDataDir } from "@tauri-apps/api/path";
 import { downloadGamePageInfo } from "../../components/functions/dataStoreGlobal";
 import { createMemoryHistory, useLocation, useNavigate } from "@solidjs/router";
 import { render } from "solid-js/web";
-import DownloadPopup from "../../Pop-Ups/Download-PopUp/Download-PopUp";
 import { path } from "@tauri-apps/api";
 
 const cacheDir = await appCacheDir();
@@ -38,7 +37,6 @@ const DownloadGameUUIDPage = () => {
     const [originalSize, setOriginalSize] = createSignal('N/A');
     const [repackSize, setRepackSize] = createSignal('N/A');
 
-    const [showPopup, setShowPopup] = createSignal(false);
     const [isToDownloadLater, setToDownloadLater] = createSignal(false);
 
 
@@ -258,12 +256,20 @@ const DownloadGameUUIDPage = () => {
         navigate(latestGlobalHref)
     }
 
-    const handleDownloadClick = () => {
-        setShowPopup(true);
-    };
-
-    const closePopup = () => {
-        setShowPopup(false);
+    const handleDownloadClick = async () => {
+        if (gameInfo() && gameInfo().magnetlink) {
+            try {
+                console.log(`Invoking Real-Debrid download for: ${gameInfo().magnetlink}`);
+                // This will be replaced with a call to the Real-Debrid backend
+                await invoke('rd_add_magnet', { magnet: gameInfo().magnetlink });
+                // TODO: Show a notification that the download has been sent to Real-Debrid
+            } catch (error) {
+                console.error('Failed to start Real-Debrid download:', error);
+                // TODO: Show an error notification
+            }
+        } else {
+            console.error('No magnet link available for this game.');
+        }
     };
 
     async function handleAddToDownloadLater(gameData, isChecked) {
@@ -311,7 +317,6 @@ const DownloadGameUUIDPage = () => {
 
     return (
         <div className="download-game content-page">
-            {showPopup() && <DownloadPopup badClosePopup={closePopup} gameTitle={extractMainTitle(gameTitle)} gameMagnet={gameInfo().magnetlink} externFullGameInfo={gameInfo()} />}
             {loading() ? (
                 <div className="loading-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-loader-circle"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>

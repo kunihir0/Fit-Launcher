@@ -1,21 +1,21 @@
 
 import { createEffect, createSignal, onMount } from 'solid-js';
 import './Settings.css'
-import TorrentingPage from './Settings-Categories/Torrenting/Torrenting';
 import GlobalSettingsPage from './Settings-Categories/Global/GlobalSettingsPage';
+import RealDebridSettings from './Settings-Categories/RealDebrid/RealDebrid';
 
 function Settings() {
-    const [activeCategory, setActiveCategory] = createSignal('dht');
+    const [activeCategory, setActiveCategory] = createSignal('global-display');
     const [activeGroup, setActiveGroup] = createSignal('global')
 
     return (
         <div className="settings content-page">
             <SettingsSidebar setActiveCategory={setActiveCategory} setActiveGroup={setActiveGroup} />
             <div className="settings-content">
-                {activeGroup() === 'torrent' ? (
-                    <TorrentingPage settingsPart={activeCategory()} />
-                ) : (
+                {activeGroup() === 'global' ? (
                     <GlobalSettingsPage settingsPart={activeCategory()} />
+                ) : (
+                    <RealDebridSettings />
                 )}
             </div>
         </div>
@@ -27,6 +27,7 @@ function SettingsSidebar({ setActiveCategory, setActiveGroup }) {
     onMount(() => {
         // Activate the first DHT element by default
         handleActivateElem('settings-display', 'global-display');
+        setActiveGroup('global');
     });
 
     // Helper function to reset all backgrounds to transparent
@@ -45,10 +46,9 @@ function SettingsSidebar({ setActiveCategory, setActiveGroup }) {
         }
 
         if (category.startsWith('global')) {
-            setActiveGroup('global')
-            console.log('GLOBAL')
+            setActiveGroup('global');
         } else {
-            setActiveGroup('torrent')
+            setActiveGroup('realdebrid');
         }
         // Update the active category state
         setActiveCategory(category);
@@ -82,26 +82,13 @@ function SettingsSidebar({ setActiveCategory, setActiveGroup }) {
                 </ul>
                 <ul className="settings-sidebar-group-list-category">
                     <p className="settings-sidebar-group-title">
-                        Torrenting
+                        Downloaders
                     </p>
-                    <a id="settings-dht" onClick={() => handleActivateElem("settings-dht", "dht")}>
-                        <svg width="24" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="-196 432.3 24 24" style="-webkit-print-color-adjust::exact" fill="none"><g class="fills"><rect rx="0" ry="0" x="-196" y="432.3" width="24" height="24" class="frame-background" /></g><g class="frame-children"><rect rx="1" ry="1" x="-180" y="448.3" width="6" height="6" style="fill:none" class="fills" /><g stroke-linejoin="round" stroke-linecap="round" class="strokes"><rect rx="1" ry="1" x="-180" y="448.3" width="6" height="6" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><rect rx="1" ry="1" x="-194" y="448.3" width="6" height="6" style="fill:none" class="fills" /><g stroke-linejoin="round" stroke-linecap="round" class="strokes"><rect rx="1" ry="1" x="-194" y="448.3" width="6" height="6" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><rect rx="1" ry="1" x="-187" y="434.3" width="6" height="6" style="fill:none" class="fills" /><g stroke-linejoin="round" stroke-linecap="round" class="strokes"><rect rx="1" ry="1" x="-187" y="434.3" width="6" height="6" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-191 448.3v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-191 448.3v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-184 444.3v-4" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-184 444.3v-4" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g></g></svg>
-                        <span>DHT</span>
-                    </a>
-                    <a id="settings-tcp" onClick={() => handleActivateElem("settings-tcp", "tcp")}>
-                        <svg width="24" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="-196 507.3 24 24" style="-webkit-print-color-adjust::exact" fill="none"><g class="fills"><rect rx="0" ry="0" x="-196" y="507.3" width="24" height="24" class="frame-background" /></g><g class="frame-children"><circle cx="-184" cy="511.8" style="fill:none" class="fills" r="2.5" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><circle cx="-184" cy="511.8" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" r="2.5" /></g><path d="m-185.8 513.6-3.9 3.9" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-185.8 513.6-3.9 3.9" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><circle cx="-191.5" cy="519.3" style="fill:none" class="fills" r="2.5" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><circle cx="-191.5" cy="519.3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" r="2.5" /></g><path d="M-189 519.3h10" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-189 519.3h10" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><circle cx="-176.5" cy="519.3" style="fill:none" class="fills" r="2.5" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><circle cx="-176.5" cy="519.3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" r="2.5" /></g><path d="m-182.2 525 3.9-3.9" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-182.2 525 3.9-3.9" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><circle cx="-184" cy="526.8" style="fill:none" class="fills" r="2.5" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><circle cx="-184" cy="526.8" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" r="2.5" /></g></g></svg>
-                        <span>TCP</span>
-                    </a>
-                    <a id="settings-persistence" onClick={() => handleActivateElem("settings-persistence", "persistence")}>
-                        <svg width="24" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="-196 582.3 24 24" style="-webkit-print-color-adjust::exact" fill="none"><g class="fills"><rect rx="0" ry="0" x="-196" y="582.3" width="24" height="24" class="frame-background" /></g><g class="frame-children"><circle cx="-184" cy="594.3" style="fill:none" class="fills" r="3" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><circle cx="-184" cy="594.3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" r="3" /></g><path d="M-191.5 592.3h-.5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-.5" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-191.5 592.3h-.5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-.5" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-191.5 596.3h-.5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-.5" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-191.5 596.3h-.5a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-.5" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><g stroke-linecap="round" stroke-linejoin="round" class="strokes" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes" /><path d="m-180.3 595.7-.9-.3" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-180.3 595.7-.9-.3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-186.8 593.2-.9-.3" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-186.8 593.2-.9-.3" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-185.4 598 .3-.9" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-185.4 598 .3-.9" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-182.4 598-.4-1" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-182.4 598-.4-1" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-185.2 591.6-.4-1" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-185.2 591.6-.4-1" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-187.7 595.9 1-.4" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-187.7 595.9 1-.4" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-181.3 593.1 1-.4" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-181.3 593.1 1-.4" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="m-182.6 590.6-.3.9" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="m-182.6 590.6-.3.9" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g></g></svg>
-                        <span>Persistence</span>
-                    </a>
-                    <a id="settings-peers-opts" onClick={() => handleActivateElem("settings-peers-opts", "peer-opts")}>
-                        <svg width="24" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="-196 657.3 24 24" style="-webkit-print-color-adjust::exact" fill="none"><g class="fills"><rect rx="0" ry="0" x="-196" y="657.3" width="24" height="24" class="frame-background" /></g><g class="frame-children"><path d="M-192 666.3a2 2 0 0 1-2-2v-2h6v2a2 2 0 0 1-2 2Z" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-192 666.3a2 2 0 0 1-2-2v-2h6v2a2 2 0 0 1-2 2Z" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-193 662.3v-2" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-193 662.3v-2" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-189 662.3v-2" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-189 662.3v-2" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-177 672.3v-8.5a3.5 3.5 0 1 0-7 0v11a3.5 3.5 0 1 1-7 0v-8.5" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-177 672.3v-8.5a3.5 3.5 0 1 0-7 0v11a3.5 3.5 0 1 1-7 0v-8.5" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-179 678.3v-2" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-179 678.3v-2" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-175 678.3v-2" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-175 678.3v-2" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g><path d="M-174 676.3h-6v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2Z" style="fill:none" class="fills" /><g stroke-linecap="round" stroke-linejoin="round" class="strokes"><path d="M-174 676.3h-6v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2Z" style="fill:none;fill-opacity:none;stroke-width:2;stroke:var(--text-color);stroke-opacity:1" class="stroke-shape" /></g></g></svg>
-                        <span>Peers Options</span>
+                    <a id="settings-realdebrid" onClick={() => handleActivateElem("settings-realdebrid", "realdebrid")}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                        <span>Real-Debrid</span>
                     </a>
                 </ul>
-
             </div>
         </div>
     )

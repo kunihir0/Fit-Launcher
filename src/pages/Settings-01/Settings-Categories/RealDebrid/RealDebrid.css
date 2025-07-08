@@ -1,0 +1,55 @@
+.real-debrid-settings {
+    padding: 20px;
+}
+
+.real-debrid-settings h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.real-debrid-settings button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.real-debrid-settings button:hover {
+    background-color: var(--primary-hover-color);
+}
+
+.auth-prompt {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--secondary-30-color);
+    border-radius: 5px;
+}
+
+.auth-prompt p {
+    margin: 5px 0;
+}
+
+.auth-prompt a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.auth-prompt a:hover {
+    text-decoration: underline;
+}
+
+.auth-status {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.auth-status.success {
+    color: #4CAF50;
+}
+
+.auth-status.failure {
+    color: #F44336;
+}

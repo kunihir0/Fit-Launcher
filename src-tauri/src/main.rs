@@ -6,13 +6,12 @@ mod game_info;
 use fit_launcher_config::settings::creation::create_gamehub_settings_file;
 use fit_launcher_config::settings::creation::create_image_cache_file;
 use fit_launcher_config::settings::creation::create_installation_settings_file;
+use fit_launcher_config::settings::creation::create_realdebrid_settings_file;
 use fit_launcher_scraping::discovery::get_100_games_unordered;
 use fit_launcher_scraping::get_sitemaps_website;
 use fit_launcher_scraping::global::functions::popular_games_scraping_func;
 use fit_launcher_scraping::global::functions::recently_updated_games_scraping_func;
 use fit_launcher_scraping::global::functions::scraping_func;
-use fit_launcher_torrent::functions::TorrentSession;
-use fit_launcher_torrent::functions::ARIA2_DAEMON;
 use serde_json::Value;
 use std::error::Error;
 use tauri::async_runtime::spawn_blocking;
@@ -38,6 +37,8 @@ pub mod utils;
 pub use utils::*;
 pub use image_colors::*;
 pub use game_info::*;
+use fit_launcher_real_debrid::auth::AuthState;
+use fit_launcher_real_debrid::client::Client;
 
 fn delete_invalid_json_files(app_handle: &tauri::AppHandle) -> Result<(), Box<dyn Error>> {
     let mut dir_path = app_handle.path().app_data_dir().unwrap();
@@ -232,12 +233,7 @@ async fn start() {
                 "quit" => {
                   info!("quit menu item was clicked");
 
-                  info!("exiting aria2 gracefully...");
-                  if let Some((close_tx, done_rx)) = ARIA2_DAEMON.lock().take() {
-                    let _ = close_tx.send(());
-                    let _ = std::thread::spawn(move ||done_rx.blocking_recv()).join();
-                  }
-                  std::process::exit(0);
+                                    std::process::exit(0);
                 }
                 "show_app" => {
                     info!("show app menu item was clicked");
@@ -293,6 +289,11 @@ async fn start() {
             if let Err(err) = create_image_cache_file() {
                 error!("Error while creating the image cache file : {}", err);
                 eprintln!("Error while creating the image cache file : {}", err)
+            }
+            
+            if let Err(err) = create_realdebrid_settings_file() {
+                error!("Error while creating the realdebrid settings file : {}", err);
+                eprintln!("Error while creating the realdebrid settings file : {}", err)
             }
 
 
@@ -411,8 +412,9 @@ async fn start() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .invoke_handler(tauri_helper::tauri_collect_commands!())
         .manage(image_cache) // Make the cache available to commands
-        .manage(TorrentSession::new().await) // Make the torrent state session available to commands
-        .build(tauri::generate_context!())
+        .manage(AuthState::new())
+        .manage(Client::new())
+                .build(tauri::generate_context!())
         .expect("error while building tauri application")
         .run(|app_handle, event| {
             if let tauri::RunEvent::ExitRequested { api, .. } = event {

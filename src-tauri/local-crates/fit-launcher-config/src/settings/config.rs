@@ -7,8 +7,7 @@ use tracing::info;
 
 use crate::client::dns::FitLauncherDnsConfig;
 
-use super::creation::GamehubSettings;
-use super::creation::InstallationSettings;
+use super::creation::{GamehubSettings, InstallationSettings, RealDebridSettings};
 
 #[derive(Debug, Serialize)]
 pub struct SettingsConfigurationError {
@@ -257,29 +256,12 @@ pub fn reset_dns_settings() -> Result<(), SettingsConfigurationError> {
 
 #[tauri::command]
 pub async fn clear_all_cache() -> Result<(), SettingsConfigurationError> {
-    let persistence_session_path = directories::BaseDirs::new()
-        .expect("Could not determine base directories")
-        .config_local_dir() // Points to AppData\Local (or equivalent on other platforms)
-        .join("com.fitlauncher.carrotrub")
-        .join("torrentConfig")
-        .join("session")
-        .join("data");
-    let persistnce_dht_path = directories::BaseDirs::new()
-        .expect("Could not determine base directories")
-        .config_local_dir() // Points to AppData\Local (or equivalent on other platforms)
-        .join("com.fitlauncher.carrotrub")
-        .join("torrentConfig")
-        .join("dht")
-        .join("cache");
-
     let image_cache_path = directories::BaseDirs::new()
         .expect("Could not determine base directories")
         .config_local_dir() // Points to AppData\Local (or equivalent on other platforms)
         .join("com.fitlauncher.carrotrub")
         .join("image_cache.json");
 
-    tokio::fs::remove_dir_all(persistence_session_path).await?;
-    tokio::fs::remove_dir_all(persistnce_dht_path).await?;
     tokio::fs::remove_file(image_cache_path).await?;
     Ok(())
 }
@@ -322,5 +304,54 @@ pub fn open_logs_directory() -> Result<(), String> {
         }
     }
 
-    Ok(())
-}
+        Ok(())
+    }
+    
+    #[tauri::command]
+    pub fn get_realdebrid_settings() -> RealDebridSettings {
+        let base_dirs = BaseDirs::new()
+            .ok_or_else(|| error!("Failed to determine base directories"))
+            .unwrap();
+    
+        let rd_file_path = base_dirs
+            .config_dir()
+            .join("com.fitlauncher.carrotrub")
+            .join("fitgirlConfig")
+            .join("settings")
+            .join("realdebrid")
+            .join("realdebrid.json");
+    
+        let file_content = fs::read_to_string(&rd_file_path)
+            .map_err(|err| {
+                error!(
+                    "Error reading the file at {:?}: {:#?}",
+                    rd_file_path, err
+                );
+            })
+            .unwrap_or("{}".to_string());
+    
+        serde_json::from_str::<RealDebridSettings>(&file_content).unwrap_or_default()
+    }
+    
+    #[tauri::command]
+    pub fn change_realdebrid_settings(
+        settings: RealDebridSettings,
+    ) -> Result<(), SettingsConfigurationError> {
+        let base_dirs = BaseDirs::new().ok_or_else(|| SettingsConfigurationError {
+            message: "Failed to determine base directories".to_string(),
+        })?;
+        let rd_file_path = base_dirs
+            .config_dir()
+            .join("com.fitlauncher.carrotrub")
+            .join("fitgirlConfig")
+            .join("settings")
+            .join("realdebrid")
+            .join("realdebrid.json");
+    
+        let settings_json_string =
+            serde_json::to_string_pretty(&settings).map_err(SettingsConfigurationError::from)?;
+    
+        fs::write(rd_file_path, settings_json_string)
+            .map_err(SettingsConfigurationError::from)?;
+        Ok(())
+    }

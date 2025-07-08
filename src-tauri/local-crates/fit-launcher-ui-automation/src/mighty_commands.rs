@@ -1,13 +1,14 @@
 #[cfg(target_os = "windows")]
 use std::process::Command;
 
+#[cfg(target_os = "windows")]
 use tracing::{error, info};
 
 /// Start an executable using tauri::command
 ///
 /// Do not worry about using String, since the path will always be obtained by dialog through Tauri thus making it always corret for the OS.
 #[tauri::command]
-pub fn start_executable(path: String) {
+pub fn start_executable(_path: String) {
     // Here, use this **ONLY** for windows OS
     #[cfg(target_os = "windows")]
     match Command::new(&path).spawn() {
